@@ -3,6 +3,7 @@
 依照 ITU-R BT.601 標準，加權公式：
 
 $$\text{Gray} = 0.299 \times R + 0.587 \times G + 0.114 \times B$$
+
 使用 np.dot 計算灰階數值，但後來發現圖片會有多餘紅點且在後續做 Absolute Difference Heatmap 時與 OpenCV 也會有許多紅點好像是內積算出來的數值不在 0-255 的區間導致整數溢位因此又加上了 np.clip 將數值限制在 0-255，最後成功在 Absolute Difference Heatmap 與 OpenCV 成果接近。
 
 ## OpenCV 程式實作原理：
