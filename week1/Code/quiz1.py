@@ -4,7 +4,6 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-#Quiz 1
 def log_run(name, ms, gray, records):
     records.append({'method': name, 'ms': ms, 'shape': gray.shape, 'mean': gray.mean()})
     print(f'{name:<6s} 執行時間: {ms:8.3f} ms | 尺寸: {gray.shape} | 平均灰階: {gray.mean():.2f}')
@@ -115,4 +114,3 @@ def analyze_records(records, gray_numpy, gray_cv, img_rgb):
     plt.tight_layout()
     plt.show()
 
-#Quiz 2
