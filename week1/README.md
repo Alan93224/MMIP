@@ -77,10 +77,16 @@ OpenCV    1.325 ms (共 29 次)
 <img src="data/quiz1_output.png" width="600" alt="灰階比較結果">
 
 
+# Quiz 2
+## Numpy 程式實作原理：
+先統計灰階直方圖 $h(k)$，累加成累積分布 $\text{cdf}(k)=\sum_{j=0}^{k} h(j)$，再映射到 0~255：
 
+$$s_k = \text{round}\left( \frac{\text{cdf}(k) - \text{cdf}_{\min}}{N - \text{cdf}_{\min}} \times 255 \right)$$
 
+其中 $N$ 為總像素數、$\text{cdf}_{\min}$ 是最小的非零累積值。算完 LUT 後用 `lut[gray]` 一次完成整張圖的查表映射。
 
-
+## OpenCV 程式實作原理：
+`cv2.equalizeHist` 底層是 C++ 實作，使用的公式與上面完全相同，可用來驗證自己寫的版本是否正確。
 
 ## 比較執行速度與轉換結果：
 === 執行紀錄 ===
@@ -151,3 +157,6 @@ OpenCV    0.750 ms (共 30 次)
 
 最大差異: 23 | 平均差異: 0.0080 | 不同的像素: 2763 / 697686
 標準差 (等化前 → 後): 89.44 → 72.05
+
+不管是 Numpy 還是 OpenCV，執行 30 次的平均灰階誤差一樣也是非常小 0.0080，代表 Numpy 有成功復刻 OpenCV 效果，但由於 OpenCV 底層使用 C++ 與 SIMD 加速，所以執行速度一定比 Numpy 快。而且可以發現在等化前原圖的 CDF 是曲線的，但是等化後 CDF 變成 45 度直線代表是有將 pixel 平均攤分的。
+<img src="data/quiz2_output.png" width="600" alt="灰階比較結果">
