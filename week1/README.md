@@ -74,7 +74,7 @@ OpenCV    1.325 ms (共 29 次)
 最大差異: 6 | 平均差異: 0.0039
 
 不管是 Numpy 還是 OpenCV，執行 30 次的平均灰階誤差非常小 0.0039，代表 Numpy 有成功復刻 OpenCV 效果，但由於 OpenCV 底層使用 C++ 與 SIMD 加速，所以執行速度一定比 Numpy 快。
-<img src="Data/quiz1_output.png" width="600" alt="灰階比較結果">
+<img src="data/quiz1_output.png" width="600" alt="灰階比較結果">
 
 
 
