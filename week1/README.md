@@ -160,3 +160,52 @@ OpenCV    0.750 ms (共 30 次)
 
 不管是 Numpy 還是 OpenCV，執行 30 次的平均灰階誤差一樣也是非常小 0.0080，代表 Numpy 有成功復刻 OpenCV 效果，但由於 OpenCV 底層使用 C++ 與 SIMD 加速，所以執行速度一定比 Numpy 快。而且可以發現在等化前原圖的 CDF 是曲線的，但是等化後 CDF 變成 45 度直線代表是有將 pixel 平均攤分的。
 <img src="data/quiz2_output.png" width="600" alt="灰階比較結果">
+
+# Quiz 3
+## OpenCV 實作 Perspective Transform（紙張校正）
+主要是做以紙張的校正為主的演算法設計：
+1. 透視變換
+透視變換（homography）把原圖座標 $(x, y)$ 以 3×3 矩陣 $H$ 映射到 $(u, v)$：
+$$u = \frac{h_{11}x + h_{12}y + h_{13}}{h_{31}x + h_{32}y + 1}, \quad v = \frac{h_{21}x + h_{22}y + h_{23}}{h_{31}x + h_{32}y + 1}$$
+$H$ 有 8 個未知數，每組對應點提供 2 條方程式，所以需要 **4 組對應點**。平面上的紙張不論從什麼角度拍，影像中的紙和正面的紙之間都剛好差一個 homography。
+`cv2.getPerspectiveTransform` 由 4 組對應點解出 $H$，`cv2.warpPerspective` 以 `INTER_LINEAR` 做反向映射與雙線性插值，底層為 C++ 實作。
+
+2. 自動偵測紙張四角（來源點，紅框）
+由 `q3.detect_paper` 完成：
+    1. 影像縮小到長邊 1000 px，轉灰階並高斯模糊，降低紙面紋理與雜訊
+    2. 紙比背景亮，從 Otsu 門檻開始二值化；閉運算填掉紙上的文字，開運算去除小雜點
+    3. 取最大輪廓的凸包，以 `cv2.approxPolyDP` 逐步放寬誤差，逼近成四邊形
+    4. 計算填滿率 $\text{fill} = \dfrac{\text{輪廓面積}}{\text{四邊形面積}}$：若背景亮處（反光的櫃門）和紙黏在一起，形狀就不像四邊形、填滿率偏離 1，這時提高門檻重做，直到 $\text{fill} > 0.95$
+    5. 四角座標放大回原圖，依序排成左上、右上、右下、左下
+
+3. 估計紙張真實長寬比（目標點，綠框）
+四個角只決定了「把邊拉直」，**決定不了長寬比**：斜拍時，離相機較遠的邊會被透視縮短，直接量四邊形邊長會嚴重失真。
+採用 Zhang & He (2007) whiteboard 方法。設影像中四角為齊次座標 $m_1$（左上）、$m_2$（右上）、$m_3$（左下）、$m_4$（右下），先求
+$$k_2 = \frac{(m_1 \times m_4)\cdot m_3}{(m_2 \times m_4)\cdot m_3}, \quad k_3 = \frac{(m_1 \times m_4)\cdot m_2}{(m_3 \times m_4)\cdot m_2}, \quad n_2 = k_2 m_2 - m_1, \quad n_3 = k_3 m_3 - m_1$$
+再以相機內參矩陣 $K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$（$u_0, v_0$ 取影像中心）得到真實的寬/高：
+$$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^{-1} n_3}}$$
+焦距 $f$（像素）的來源優先序：
+    1. `focal` 參數
+    2. EXIF 的 35mm 等效焦距換算：$f = f_{35} \cdot \dfrac{\text{影像對角線 (px)}}{\sqrt{36^2 + 24^2}}$
+    3. 由四角點反推（同篇論文的公式，正面拍攝時退化無法使用）
+    4. 預設值（26 mm 等效焦距）
+目標長方形的高取來源四邊形左右邊較長者（保留解析度），寬 = 高 × 長寬比。
+
+## 結果
+我有在兩種視角下做梯形轉換，一種是側面視角一種是旋轉的視角：
+1. 旋轉視角：
+<img src="data/quiz3output_good5.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_good6.png" width="600" alt="灰階比較結果">
+旋轉視角比較簡單，比較不會因為與角落距離遠近影響校正的完整度，所以校正結果比較沒有問題，不會有因為角度導致四邊形失真的情況
+
+2. 側面視角：
+<img src="data/quiz3output_good1.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_good2.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_good3.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_good4.png" width="600" alt="灰階比較結果">
+側面視角因為斜拍時，離相機較遠的邊會被透視縮短，直接量四邊形邊長如果角度太小會失真。兩側都在與紙張水平面大概 15 度以上是都能校正得很成功的，但如果兩側是在 15 度以內的話：
+<img src="data/quiz3output_bad.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_bad2.png" width="600" alt="灰階比較結果">
+就會像圖片所示四邊形的邊長會有些微失真，我認為就是因為與紙張水平面角度太小、太側了導致紙張水平寬度有嚴重的投影短縮導致紙張寬度被壓縮，沒辦法完全正確的算出正確寬度
+
+# Quiz 4
