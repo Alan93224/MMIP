@@ -83,7 +83,9 @@ OpenCV    1.325 ms (共 29 次)
 
 $$s_k = \text{round}\left( \frac{\text{cdf}(k) - \text{cdf}_{\min}}{N - \text{cdf}_{\min}} \times 255 \right)$$
 
-其中 $N$ 為總像素數、$\text{cdf}_{\min}$ 是最小的非零累積值。算完 LUT 後用 `lut[gray]` 一次完成整張圖的查表映射。
+其中 $N$ 為總像素數、
+$\text{cdf}_{\min}$ 
+是最小的非零累積值。算完 LUT 後用 `lut[gray]` 一次完成整張圖的查表映射。
 
 ## OpenCV 程式實作原理：
 `cv2.equalizeHist` 底層是 C++ 實作，使用的公式與上面完全相同，可用來驗證自己寫的版本是否正確。
@@ -182,7 +184,9 @@ $H$ 有 8 個未知數，每組對應點提供 2 條方程式，所以需要 **4
 四個角只決定了「把邊拉直」，**決定不了長寬比**：斜拍時，離相機較遠的邊會被透視縮短，直接量四邊形邊長會嚴重失真。
 採用 Zhang & He (2007) whiteboard 方法。設影像中四角為齊次座標 $m_1$（左上）、$m_2$（右上）、$m_3$（左下）、$m_4$（右下），先求
 $$k_2 = \frac{(m_1 \times m_4)\cdot m_3}{(m_2 \times m_4)\cdot m_3}, \quad k_3 = \frac{(m_1 \times m_4)\cdot m_2}{(m_3 \times m_4)\cdot m_2}, \quad n_2 = k_2 m_2 - m_1, \quad n_3 = k_3 m_3 - m_1$$
-再以相機內參矩陣 $K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$（$u_0, v_0$ 取影像中心）得到真實的寬/高：
+再以相機內參矩陣 
+$K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$
+（$u_0, v_0$ 取影像中心）得到真實的寬/高：
 $$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^{-1} n_3}}$$
 焦距 $f$（像素）的來源優先序：
     1. `focal` 參數
