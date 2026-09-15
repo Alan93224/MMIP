@@ -194,18 +194,18 @@ $$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^
 ## 結果
 我有在兩種視角下做梯形轉換，一種是側面視角一種是旋轉的視角：
 1. 旋轉視角：
-<img src="data/quiz3output_good5.png" width="600" alt="灰階比較結果">
-<img src="data/quiz3output_good6.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_good5.png" width="600" alt="旋轉梯形轉換結果1">
+<img src="data/quiz3output_good6.png" width="600" alt="旋轉梯形轉換結果2">
 旋轉視角比較簡單，比較不會因為與角落距離遠近影響校正的完整度，所以校正結果比較沒有問題，不會有因為角度導致四邊形失真的情況
 
 2. 側面視角：
-<img src="data/quiz3output_good1.png" width="600" alt="灰階比較結果">
-<img src="data/quiz3output_good2.png" width="600" alt="灰階比較結果">
-<img src="data/quiz3output_good3.png" width="600" alt="灰階比較結果">
-<img src="data/quiz3output_good4.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_good1.png" width="600" alt="梯形轉換 good 結果1">
+<img src="data/quiz3output_good2.png" width="600" alt="梯形轉換 good 結果2">
+<img src="data/quiz3output_good3.png" width="600" alt="梯形轉換 good 結果3">
+<img src="data/quiz3output_good4.png" width="600" alt="梯形轉換 good 結果4">
 側面視角因為斜拍時，離相機較遠的邊會被透視縮短，直接量四邊形邊長如果角度太小會失真。兩側都在與紙張水平面大概 15 度以上是都能校正得很成功的，但如果兩側是在 15 度以內的話：
-<img src="data/quiz3output_bad.png" width="600" alt="灰階比較結果">
-<img src="data/quiz3output_bad2.png" width="600" alt="灰階比較結果">
+<img src="data/quiz3output_bad.png" width="600" alt="梯形轉換bad結果1">
+<img src="data/quiz3output_bad2.png" width="600" alt="梯形轉換bad結果2">
 就會像圖片所示四邊形的邊長會有些微失真，我認為就是因為與紙張水平面角度太小、太側了導致紙張長寬有嚴重的投影短縮導致紙張長寬被壓縮，沒辦法完全正確的算出正確長寬
 
 # Quiz 4
@@ -223,15 +223,14 @@ $$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^
 $$d_{\text{root}} = \sqrt{\frac{d}{\lVert d \rVert_1}}$$
 
 以歐氏距離比較 RootSIFT 等同於以 Hellinger 距離比較原本的梯度直方圖，受少數大值主導的程度較低，對光照變化更穩健。
-3. SIFT 特徵偵測
 
+3. SIFT 特徵偵測
     1. 建立高斯尺度空間，相鄰尺度相減得到 DoG（Difference of Gaussians），在空間與尺度上找極值點 → 具**尺度不變性**
     2. 去除低對比與位於邊緣上的點
     3. 以鄰域梯度方向直方圖決定主方向 → 具**旋轉不變性**
     4. 在主方向座標下，取 4×4 區塊、每塊 8 個方向的梯度直方圖，組成 128 維描述子
 
 4. 特徵匹配與篩選
-
     1. **FLANN KD-tree** 找每個描述子在另一張影像中的最近鄰與次近鄰
     2. **Lowe ratio test**：只有 $d_1 < 0.75 \cdot d_2$ 才保留。重複紋理（窗戶、磁磚）的最近鄰和次近鄰距離很接近，屬於模稜兩可的匹配，會被排除
     3. **雙向一致**：影像 1→2 與 2→1 必須互為最佳匹配
@@ -243,7 +242,6 @@ $$\begin{bmatrix} x_1 \ y_1 \ 1 \end{bmatrix} \sim H \begin{bmatrix} x_2 \ y_2 \
 $H$ 有 8 個自由度，至少需 4 組匹配點。匹配結果仍含錯誤匹配，因此用 `cv2.findHomography` 搭配 **USAC_MAGSAC**（改良版 RANSAC）：反覆隨機取 4 點算 $H$，統計重投影誤差小於 4 px 的內點數，取最佳解並以所有內點重新最佳化。內點少於 15 組視為重疊不足、拼接失敗。
 
 6. 投影與融合
-
     1. 用 $H$ 投影影像 2 的四角，和影像 1 一起算出畫布範圍，加上平移矩陣 $T$ 避免座標為負
     2. 影像 1 以 $T$、影像 2 以 $T \cdot H$ 分別 `cv2.warpPerspective` 到畫布
     3. **羽化融合 (feathering)**：每個像素的權重 $w$ 為到自身影像邊界的距離（`cv2.distanceTransform`）
@@ -255,9 +253,29 @@ $$I = \frac{w_1 I_1 + w_2 I_2}{w_1 + w_2}$$
     4. 裁掉四周全黑的區域
 
 ## 結果
+
 我有以不同角度與不同亮度為變因做影像拼接：
-<img src="data/quiz4_1.JPG" width="300" alt="灰階比較結果">
+<img src="data/quiz4_1.JPG" width="300" alt="影像拼接 input1">
 +
-<img src="data/quiz4_2.JPG" width="300" alt="灰階比較結果">
+<img src="data/quiz4_2.JPG" width="300" alt="影像拼接 input2">
 =
-<img src="data/quiz4output_1.png" width="600" alt="灰階比較結果">
+<img src="data/quiz4output_1.png" width="600" alt="影像拼接 output">
+這是最基本正視圖的拼接結果，整體效果挺好的，黑色沒辦法拼接的區塊很少
+<img src="data/quiz4_3.JPG" width="300" alt="斜角度影像拼接 input1">
++
+<img src="data/quiz4_4.JPG" width="300" alt="斜角度影像拼接 input2">
+=
+<img src="data/quiz4output_2.png" width="600" alt="斜角度影像拼接 output">
+這是稍微有點斜角度的視角做拼接的結果，整體效果也不錯，也只有小部分黑色區塊
+<img src="data/quiz4_5.JPG" width="300" alt="更斜角度影像拼接 input1">
++
+<img src="data/quiz4_6.JPG" width="300" alt="更斜角度影像拼接 input2">
+=
+<img src="data/quiz4output_3.png" width="600" alt="更斜角度影像拼接 output">
+這是再更斜的角度拼接出來的結果，雖然在重點的紙張部分拼接滿成功的，但在周圍會有比較多因為兩張 input 圖沒辦法覆蓋的黑色區塊導致透視拉伸嚴重
+<img src="data/quiz4_7.JPG" width="300" alt="光暗度影像拼接 input1">
++
+<img src="data/quiz4_8.JPG" width="300" alt="光暗度影像拼接 input2">
+=
+<img src="data/quiz4output_4.png" width="600" alt="光暗度影像拼接 output">
+最後這是將亮度調暗拍攝的照片拼接結果，拼接結果也挺好的，黑色區塊也很少
