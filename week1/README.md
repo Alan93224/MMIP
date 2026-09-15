@@ -186,7 +186,9 @@ $H$ 有 8 個未知數，每組對應點提供 2 條方程式，所以需要 **4
 $$k_2 = \frac{(m_1 \times m_4)\cdot m_3}{(m_2 \times m_4)\cdot m_3}, \quad k_3 = \frac{(m_1 \times m_4)\cdot m_2}{(m_3 \times m_4)\cdot m_2}, \quad n_2 = k_2 m_2 - m_1, \quad n_3 = k_3 m_3 - m_1$$
 再以相機內參矩陣
 
-$K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$ 
+```math
+K = \begin{bmatrix} f & 0 & u_0 \\ 0 & f & v_0 \\ 0 & 0 & 1 \end{bmatrix}
+```
 
 （ $u_0 , v_0$ 取影像中心）得到真實的寬/高：
 $$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^{-1} n_3}}$$
@@ -243,7 +245,9 @@ $$d_{\text{root}} = \sqrt{\frac{d}{\lVert d \rVert_1}}$$
 
 5. 估計單應矩陣 $H$
 
-$$\begin{bmatrix} x_1 \ y_1 \ 1 \end{bmatrix} \sim H \begin{bmatrix} x_2 \ y_2 \ 1 \end{bmatrix}$$
+```math
+\begin{bmatrix} x_1 \\ y_1 \\ 1 \end{bmatrix} \sim H \begin{bmatrix} x_2 \\ y_2 \\ 1 \end{bmatrix}
+```
 
 $H$ 有 8 個自由度，至少需 4 組匹配點。匹配結果仍含錯誤匹配，因此用 `cv2.findHomography` 搭配 **USAC_MAGSAC**（改良版 RANSAC）：反覆隨機取 4 點算 $H$，統計重投影誤差小於 4 px 的內點數，取最佳解並以所有內點重新最佳化。內點少於 15 組視為重疊不足、拼接失敗。
 
