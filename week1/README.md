@@ -256,8 +256,8 @@ $$I = \frac{w_1 I_1 + w_2 I_2}{w_1 + w_2}$$
 
 ## 結果
 我有以不同角度與不同亮度為變因做影像拼接：
-<img src="data/quiz4_1.JPG" width="600" alt="灰階比較結果">
+<img src="data/quiz4_1.JPG" width="300" alt="灰階比較結果">
 +
-<img src="data/quiz4_2.JPG" width="600" alt="灰階比較結果">
+<img src="data/quiz4_2.JPG" width="300" alt="灰階比較結果">
 =
 <img src="data/quiz4output_1.png" width="600" alt="灰階比較結果">
