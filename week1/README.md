@@ -247,13 +247,10 @@ $H$ 有 8 個自由度，至少需 4 組匹配點。匹配結果仍含錯誤匹�
     3. **羽化融合 (feathering)**：每個像素的權重 $w$ 為到自身影像邊界的距離（`cv2.distanceTransform`）
 
 $$I = \frac{w_1 I_1 + w_2 I_2}{w_1 + w_2}$$
-
     重疊區越靠近影像中心權重越大，接縫處亮度平滑過渡，不會出現明顯切線
-
     4. 裁掉四周全黑的區域
 
 ## 結果
-
 我有以不同角度與不同亮度為變因做影像拼接：
 <img src="data/quiz4_1.JPG" width="300" alt="影像拼接 input1">
 +
@@ -261,21 +258,21 @@ $$I = \frac{w_1 I_1 + w_2 I_2}{w_1 + w_2}$$
 =
 <img src="data/quiz4output_1.png" width="600" alt="影像拼接 output">
 這是最基本正視圖的拼接結果，整體效果挺好的，黑色沒辦法拼接的區塊很少
-<img src="data/quiz4_3.JPG" width="300" alt="斜角度影像拼接 input1">
+<img src="data/quiz4_3.JPG" width="250" alt="斜角度影像拼接 input1">
 +
-<img src="data/quiz4_4.JPG" width="300" alt="斜角度影像拼接 input2">
+<img src="data/quiz4_4.JPG" width="250" alt="斜角度影像拼接 input2">
 =
 <img src="data/quiz4output_2.png" width="600" alt="斜角度影像拼接 output">
 這是稍微有點斜角度的視角做拼接的結果，整體效果也不錯，也只有小部分黑色區塊
-<img src="data/quiz4_5.JPG" width="300" alt="更斜角度影像拼接 input1">
+<img src="data/quiz4_5.JPG" width="250" alt="更斜角度影像拼接 input1">
 +
-<img src="data/quiz4_6.JPG" width="300" alt="更斜角度影像拼接 input2">
+<img src="data/quiz4_6.JPG" width="250" alt="更斜角度影像拼接 input2">
 =
 <img src="data/quiz4output_3.png" width="600" alt="更斜角度影像拼接 output">
 這是再更斜的角度拼接出來的結果，雖然在重點的紙張部分拼接滿成功的，但在周圍會有比較多因為兩張 input 圖沒辦法覆蓋的黑色區塊導致透視拉伸嚴重
-<img src="data/quiz4_7.JPG" width="300" alt="光暗度影像拼接 input1">
+<img src="data/quiz4_7.JPG" width="250" alt="光暗度影像拼接 input1">
 +
-<img src="data/quiz4_8.JPG" width="300" alt="光暗度影像拼接 input2">
+<img src="data/quiz4_8.JPG" width="250" alt="光暗度影像拼接 input2">
 =
 <img src="data/quiz4output_4.png" width="600" alt="光暗度影像拼接 output">
 最後這是將亮度調暗拍攝的照片拼接結果，拼接結果也挺好的，黑色區塊也很少
