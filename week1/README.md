@@ -247,15 +247,13 @@ $H$ 有 8 個自由度，至少需 4 組匹配點。匹配結果仍含錯誤匹�
     3. **羽化融合 (feathering)**：每個像素的權重 $w$ 為到自身影像邊界的距離（`cv2.distanceTransform`）
 
 $$I = \frac{w_1 I_1 + w_2 I_2}{w_1 + w_2}$$
-    重疊區越靠近影像中心權重越大，接縫處亮度平滑過渡，不會出現明顯切線
+    
+重疊區越靠近影像中心權重越大，接縫處亮度平滑過渡，不會出現明顯切線
     4. 裁掉四周全黑的區域
 
 ## 結果
 我有以不同角度與不同亮度為變因做影像拼接：
-<img src="data/quiz4_1.JPG" width="300" alt="影像拼接 input1">
-+
-<img src="data/quiz4_2.JPG" width="300" alt="影像拼接 input2">
-=
+<img src="data/quiz4_1.JPG" width="300" alt="影像拼接 input1">+<img src="data/quiz4_2.JPG" width="300" alt="影像拼接 input2">=
 <img src="data/quiz4output_1.png" width="600" alt="影像拼接 output">
 這是最基本正視圖的拼接結果，整體效果挺好的，黑色沒辦法拼接的區塊很少
 <img src="data/quiz4_3.JPG" width="250" alt="斜角度影像拼接 input1">
