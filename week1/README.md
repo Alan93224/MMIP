@@ -185,12 +185,11 @@ $H$ 有 8 個未知數，每組對應點提供 2 條方程式，所以需要 **4
 採用 Zhang & He (2007) whiteboard 方法。設影像中四角為齊次座標 $m_1$（左上）、$m_2$（右上）、$m_3$（左下）、$m_4$（右下），先求
 $$k_2 = \frac{(m_1 \times m_4)\cdot m_3}{(m_2 \times m_4)\cdot m_3}, \quad k_3 = \frac{(m_1 \times m_4)\cdot m_2}{(m_3 \times m_4)\cdot m_2}, \quad n_2 = k_2 m_2 - m_1, \quad n_3 = k_3 m_3 - m_1$$
 再以相機內參矩陣 
-$K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$
-（$u_0, v_0$ 取影像中心）得到真實的寬/高：
+$K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$ （ $u_0 , v_0$ 取影像中心）得到真實的寬/高：
 $$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^{-1} n_3}}$$
 焦距 $f$（像素）的來源優先序：
     1. `focal` 參數
-    2. EXIF 的 35mm 等效焦距換算：$f = f_{35} \cdot \dfrac{\text{影像對角線 (px)}}{\sqrt{36^2 + 24^2}}$
+    2. EXIF 的 35mm 等效焦距換算： $f = f_{35} \cdot \dfrac{\text{影像對角線 (px)}}{\sqrt{36^2 + 24^2}}$
     3. 由四角點反推（同篇論文的公式，正面拍攝時退化無法使用）
     4. 預設值（26 mm 等效焦距）
 目標長方形的高取來源四邊形左右邊較長者（保留解析度），寬 = 高 × 長寬比。
