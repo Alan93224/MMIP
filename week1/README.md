@@ -187,6 +187,7 @@ $$k_2 = \frac{(m_1 \times m_4)\cdot m_3}{(m_2 \times m_4)\cdot m_3}, \quad k_3 =
 再以相機內參矩陣
 
 $K = \begin{bmatrix} f & 0 & u_0 \ 0 & f & v_0 \ 0 & 0 & 1 \end{bmatrix}$ 
+
 （ $u_0 , v_0$ 取影像中心）得到真實的寬/高：
 $$\frac{W}{H} = \sqrt{\frac{n_2^\top K^{-\top} K^{-1} n_2}{n_3^\top K^{-\top} K^{-1} n_3}}$$
 焦距 $f$（像素）的來源優先序：
