@@ -80,3 +80,87 @@ LogisticRegression Threshold == 0.3560 (best threshold)：
 
 # Quiz 2
 
+
+## Feature Scaling：
+
+    縮放前 訓練集各欄位數值範圍: min=-12.7, max=75.0
+    縮放後 訓練集各欄位數值範圍: min=-5.90, max=8.88 | mean=-0.0000, std=1.0000
+
+## 5-Fold 交叉驗證：
+
+    Fold 1/5: Acc=0.8188 P=0.6484 R=0.3950 F1=0.4910 AUC=0.7742 (best epoch 38)
+    Fold 2/5: Acc=0.8264 P=0.6805 R=0.4058 F1=0.5084 AUC=0.7811 (best epoch 64)
+    Fold 3/5: Acc=0.8186 P=0.6515 R=0.3864 F1=0.4851 AUC=0.7742 (best epoch 57)
+    Fold 4/5: Acc=0.8198 P=0.6654 R=0.3724 F1=0.4776 AUC=0.7741 (best epoch 31)
+    Fold 5/5: Acc=0.8231 P=0.6883 R=0.3660 F1=0.4779 AUC=0.7646 (best epoch 47)
+
+    5-Fold 平均:
+    accuracy   0.8213 ± 0.0034
+    precision  0.6668 ± 0.0175
+    recall     0.3851 ± 0.0162
+    f1         0.4880 ± 0.0127
+    auc        0.7737 ± 0.0059
+
+## Baseline 參數
+
+    BASE_HIDDEN_DIMS = (64,)      # 單一隱藏層，未調整
+    BASE_DROPOUT = 0.0            # 不用 Dropout
+    BASE_EPOCHS = 100             # 與改良模型相同，確保比較公平
+    BASE_BATCH_SIZE = 128
+    BASE_LR = 1e-3                # Adam 預設學習率，未調整
+    BASE_WEIGHT_DECAY = 0.0       # 不用 L2 Regularization
+    BASE_OPTIMIZER = 'adam'       # 未更換 Optimizer
+
+<img src="data/quiz2_loss_curves1.png" width="600" alt="quiz2_loss_curves1">
+
+## Improved 參數
+
+    HIDDEN_DIMS = (128, 64, 32)   # 隱藏層神經元數
+    DROPOUT = 0.3                 # 每層丟棄 30% 神經元
+    USE_BATCHNORM = False         # 關閉 BatchNorm，避免一兩個 epoch 就收斂完
+    EPOCHS = 100                  # 需求 >= 50
+    BATCH_SIZE = 128
+    LEARNING_RATE = 3e-4
+    OPTIMIZER = 'adam'
+    SCHEDULER = 'cosine'          # 學習率餘弦衰減
+    PATIENCE = 20                 # 連續 20 個 epoch 沒進步就 early stopping
+
+<img src="data/quiz2_loss_curves2.png" width="600" alt="quiz2_loss_curves2">
+
+<img src="data/quiz2_confusion_matrix.png" width="600" alt="quiz2_confusion_matrix">
+
+## Classification Threshold：
+
+<img src="data/threshold_curves3.png" width="600" alt="threshold_curves3">
+
+    [Validation / Tuned] Threshold = 0.2700
+    Confusion Matrix (row=真實, col=預測, 0=正常, 1=違約):
+                pred_0    pred_1
+    true_0        3904       769
+    true_1         531       796
+    Accuracy : 0.7833
+    Precision: 0.5086
+    Recall   : 0.5998
+    F1-Score : 0.5505
+    ROC-AUC  : 0.7818
+
+    [Test / Tuned] Threshold = 0.2700
+    Confusion Matrix (row=真實, col=預測, 0=正常, 1=違約):
+                pred_0    pred_1
+    true_0        1980       356
+    true_1         284       380
+    Accuracy : 0.7867
+    Precision: 0.5163
+    Recall   : 0.5723
+    F1-Score : 0.5429
+    ROC-AUC  : 0.7779
+
+## Overfitting & Validation Loss：
+
+<img src="data/quiz2_loss_curves3.png" width="600" alt="quiz2_loss_curves3">
+
+1. 從圖片可知在基礎版本中在 Validation Loss 與 Test Loss 中，大約在第 20 ~ 30 個 Epoch 達到最低點後就開始震盪並逐漸往上飄，但它的 Training Loss 卻一路下降，這是 Overfitting會出現的徵兆
+
+2. 在 Improved 版本中 Validation Loss 與 Test Loss 都持續穩定下降至約 0.430 與 0.429，沒有出現反彈上揚的現象，代表泛化能力顯著提升，也因為 Loss 曲線平緩收斂代表模型很穩定地學習。
+
+3. Improved 版本加入 Early Stopping 機制，Improved Loss 曲線在大約 75 個 Epoch 就自動停止，沒有跑滿 100 Epoch，代表早停機制成功偵測到 Loss 已經收斂飽和，避免後續有 Overfitting 的風險。
