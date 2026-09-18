@@ -380,26 +380,6 @@ def cross_validate_mlp(X_train, y_train, input_dim=None, n_splits=5,
     return table
 
 
-def predict_one_sample(model, X_scaled, y_true, feature_names, index=0,
-                       threshold=0.5, X_raw=None, top_k=8):
-    """展示單一筆樣本的預測過程：輸入特徵 -> 模型機率 -> 預測類別 -> 對照真實標籤。"""
-    x = X_scaled[index:index + 1]                       # 保持 2D 形狀 (1, n_features)
-    prob = float(predict_proba(model, x)[0])
-    pred = int(prob >= threshold)
-    truth = int(y_true[index])
-
-    print(f'=== Validation 第 {index} 筆樣本 ===')
-    source = X_raw if X_raw is not None else X_scaled
-    tag = '前處理後' if X_raw is not None else '縮放後'
-    print(f'部分輸入特徵（{tag}，前 {top_k} 欄）:')
-    for name, val in list(zip(feature_names, source[index]))[:top_k]:
-        print(f'  {name:<12s} = {val:12.2f}')
-    print(f'\n模型輸出違約機率 = {prob:.4f}  (門檻 {threshold})')
-    print(f'預測結果 = {pred} ({"違約" if pred else "正常"})')
-    print(f'真實標籤 = {truth} ({"違約" if truth else "正常"})')
-    print('判斷:', '預測正確 (O)' if pred == truth else '預測錯誤 (X)')
-    return {'index': index, 'prob': prob, 'pred': pred, 'true': truth}
-
 
 # ============================================================
 # 4. 視覺化

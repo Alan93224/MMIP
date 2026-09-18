@@ -159,8 +159,139 @@ LogisticRegression Threshold == 0.3560 (best threshold)：
 
 <img src="data/quiz2_loss_curves3.png" width="600" alt="quiz2_loss_curves3">
 
-1. 從圖片可知在基礎版本中在 Validation Loss 與 Test Loss 中，大約在第 20 ~ 30 個 Epoch 達到最低點後就開始震盪並逐漸往上飄，但它的 Training Loss 卻一路下降，這是 Overfitting會出現的徵兆
+1. 從圖片可知在基礎版本中在 Validation Loss 與 Test Loss 中，大約在第 20 ~ 30 個 Epoch 達到最低點後就開始震盪並逐漸往上飄，但它的 Training Loss 卻一路下降，這是 Overfitting 會出現的徵兆
 
 2. 在 Improved 版本中 Validation Loss 與 Test Loss 都持續穩定下降至約 0.430 與 0.429，沒有出現反彈上揚的現象，代表泛化能力顯著提升，也因為 Loss 曲線平緩收斂代表模型很穩定地學習。
 
 3. Improved 版本加入 Early Stopping 機制，Improved Loss 曲線在大約 75 個 Epoch 就自動停止，沒有跑滿 100 Epoch，代表早停機制成功偵測到 Loss 已經收斂飽和，避免後續有 Overfitting 的風險。
+
+# Quiz 3
+
+## MLP 對 Validation Dataset 輸出的 Prediction Score / Probability
+
+    === [MLP] Validation Dataset Prediction Score（共 6000 筆，門檻 0.2700）===
+    Score 範圍: min=0.0037, max=0.9283, mean=0.2250, median=0.1489
+    預測為違約(1): 1565 筆 (26.08%) | 真實違約(1): 1327 筆 (22.12%)
+    預測正確: 4700 / 6000 (78.33%)
+    平均 Score（依真實標籤分組）: 正常(0)=0.1766, 違約(1)=0.3953
+    ROC-AUC: 0.7818
+
+    前 10 筆明細:
+    index   prob  pred  true  correct  LIMIT_BAL     AGE   PAY_0   PAY_2
+        0 0.0425     0     0     True    11.9184 26.0000  0.0000  0.0000
+        1 0.1382     0     0     True    12.9480 45.0000  1.0000 -1.0000
+        2 0.0815     0     0     True    12.2061 37.0000 -2.0000 -2.0000
+        3 0.1269     0     0     True    11.9184 35.0000 -1.0000 -1.0000
+        4 0.6126     1     1     True    11.1563 30.0000  2.0000  2.0000
+        5 0.4274     1     0    False     9.9035 43.0000  1.0000 -1.0000
+        6 0.3359     1     0    False    12.9715 34.0000  1.0000  2.0000
+        7 0.1498     0     0     True    10.5967 49.0000  0.0000  0.0000
+        8 0.6868     1     0    False    10.8198 24.0000  2.0000  0.0000
+        9 0.0524     0     0     True    12.7939 30.0000 -1.0000 -1.0000
+
+## Prediction Score 分布（區間平均分數 vs. 實際違約率）:
+
+<img src="data/Prediction_Score_Distribution1.png" width="600" alt="Prediction_Score_Distribution1">
+
+## XGBoost Model Prediction Score / Probability：
+
+    === [XGBoost] Validation Dataset Prediction Score（共 6000 筆，門檻 0.5570）===
+    Score 範圍: min=0.0683, max=0.9510, mean=0.4281, median=0.3738
+    預測為違約(1): 1479 筆 (24.65%) | 真實違約(1): 1327 筆 (22.12%)
+    預測正確: 4746 / 6000 (79.10%)
+    平均 Score（依真實標籤分組）: 正常(0)=0.3744, 違約(1)=0.6170
+    ROC-AUC: 0.7837
+
+    前 10 筆明細:
+    index   prob  pred  true  correct  LIMIT_BAL     AGE   PAY_0   PAY_2
+        0 0.1584     0     0     True    11.9184 26.0000  0.0000  0.0000
+        1 0.3850     0     0     True    12.9480 45.0000  1.0000 -1.0000
+        2 0.2030     0     0     True    12.2061 37.0000 -2.0000 -2.0000
+        3 0.3821     0     0     True    11.9184 35.0000 -1.0000 -1.0000
+        4 0.8574     1     1     True    11.1563 30.0000  2.0000  2.0000
+        5 0.7074     1     0    False     9.9035 43.0000  1.0000 -1.0000
+        6 0.4998     0     0     True    12.9715 34.0000  1.0000  2.0000
+        7 0.4600     0     0     True    10.5967 49.0000  0.0000  0.0000
+        8 0.8454     1     0    False    10.8198 24.0000  2.0000  0.0000
+        9 0.0935     0     0     True    12.7939 30.0000 -1.0000 -1.0000
+
+<img src="data/XGBoost_early_stopping.png" width="600" alt="XGBoost_early_stopping">
+
+<img src="data/XGBoost_feature.png" width="600" alt="XGBoost_feature">
+
+## MLP & XGBoost ROC Curve
+
+ROC 曲線（Receiver Operating Characteristic Curve）
+
+    ROC 曲線是用來評估二元分類模型在不同分類門檻（Threshold）下整體表現的視覺化工具。
+
+    橫軸（FPR，假陽性率）：所有真實為「負例（正常）」的樣本中，被誤判為「正例（違約）」的比例（愈低愈好）。
+
+    縱軸（TPR / Recall，真陽性率 / 召回率）：所有真實為「正例（違約）」的樣本中，被正確抓出的比例（愈高愈好）。
+
+    曲線意義：當你將分類門檻從 1.0 慢慢降到 0.0 時，每組 (FPR, TPR) 所連成的軌跡。曲線愈往左上方凸起，代表模型能在產生極低誤報（低 FPR）的同時，抓出極高比例的真實目標（高 TPR）。
+
+AUC（Area Under the ROC Curve）
+
+    AUC 即為 ROC 曲線下方的面積，是用單一數值量化模型「區分能力（Discrimination）」的指標，數值範圍介於 0 到 1 之間：
+
+    AUC = 0.5：等同於隨機猜測（擲硬幣）。
+
+    0.7 ≤ AUC < 0.8：可接受至良好的區分能力。
+
+    0.8 ≤ AUC < 0.9：極佳的辨識度。
+
+    AUC = 1.0：完美分類器（完全無誤判）。
+
+<img src="data/ROC1.png" width="600" alt="ROC1">
+
+## 兩個模型比較
+
+<img src="data/validation metrics.png" width="600" alt="validation metrics">
+
+<img src="data/model_comparison (2).png" width="600" alt="model_comparison (2)">
+
+## 正負區分能力
+
+1. XGBoost 全面領先Average Precision (PR-AUC)：
+
+        Average Precision (PR-AUC)：
+        
+        XGBoost: 0.5559 vs. MLP： 0.5426（XGBoost +0.0133）
+
+        在違約預測這種不平衡資料集中，PR-AUC 比 ROC-AUC 更能反映對「少數正類」的區分品質。XGBoost 顯著高出 1.3%，說明它在高風險客戶的排序上更精準。
+        
+        ROC-AUC：
+        
+        XGBoost: 0.7837 vs. MLP: 0.7818（XGBoost 略勝 +0.0019）
+        
+        代表任挑一名違約客戶與一 名正常客戶，XGBoost 給違約客戶更高分數的機率更高。
+
+2. 類別分數分離度（Separation Gap） ：
+
+        觀察兩組在「正常 vs 違約」上的平均分數差：
+
+        XGBoost：
+
+        正常組平均分：$0.3744$
+
+        違約組平均分：$0.6170$
+
+        分離度（差距）：$0.2426$
+
+        MLP：
+
+        正常組平均分：$0.1766$
+
+        違約組平均分：$0.3953$
+
+        分離度（差距）：$0.2187$
+
+        XGBoost 把兩群人的平均差距拉開了 0.2426，比 MLP 的 0.2187 更寬，代表其對正負樣  本的對比感更強烈。
+3. 極端高風險區間的純度（Purity）：
+
+        從兩者的前 5 筆最高分（預測機率 $> 0.90$）細節可看出差異：
+
+        MLP 的盲區：在 $> 0.9$ 的 5 筆樣本中，竟然有 3 筆是正常人（actual_rate 僅 40%），代表 MLP 在極端高分區有「過度自信卻看走眼」的現象。
+
+        XGBoost：AP 高達 0.5559，代表排在最前段（高分區）的真實違約密度比 MLP 更乾淨。
